@@ -300,3 +300,68 @@ export async function getNguoncDetail(slug: string): Promise<MovieDetail> {
     })),
   }
 }
+
+export async function getOphimMoviesByGenre(genre: string, page: number) {
+  const url = new URL(`/v1/api/the-loai/${genre}`, OPHIM_BASE)
+  url.searchParams.set('page', String(page))
+
+  const json: any = await requestJson(url.toString())
+  const data = json?.data ?? json
+  const imageBase = data?.APP_DOMAIN_CDN_IMAGE || data?.pathImage || OPHIM_IMAGE
+  const rawItems = toArray(data?.items ?? json?.items)
+  const items = rawItems
+    .filter(includesAnimation)
+    .map((item) => normalizeOphimMovie(item, imageBase))
+    .filter((movie) => movie.slug)
+
+  return {
+    items,
+    pagination: data?.params?.pagination ?? data?.pagination ?? json?.pagination ?? {},
+  }
+}
+
+export async function getNguoncMoviesByGenre(genre: string, page: number) {
+  const url = new URL(`/api/films/the-loai/${genre}`, NGUONC_BASE)
+  url.searchParams.set('page', String(page))
+
+  const json: any = await requestJson(url.toString())
+  const data = json?.data ?? json
+  const rawItems = toArray(data?.items ?? data?.films ?? json?.items)
+  const items = rawItems
+    .filter(includesAnimation)
+    .map(normalizeNguoncMovie)
+    .filter((movie) => movie.slug)
+
+  return {
+    items,
+    pagination: data?.pagination ?? json?.pagination ?? {},
+  }
+}
+
+export async function getMoviesByGenre(genre: string, page: number) {
+  const results = await Promise.allSettled([
+    getOphimMoviesByGenre(genre, page),
+    getNguoncMoviesByGenre(genre, page),
+  ])
+
+  const items = results.flatMap((result) => result.status === 'fulfilled' ? result.value.items : [])
+  const seen = new Set<string>()
+  const unique = items.filter((movie) => {
+    const key = movie.slug || `${movie.source}:${movie.name}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+
+  const pagination = results.find((result) => result.status === 'fulfilled')?.value.pagination ?? {}
+
+  return {
+    items: unique,
+    page,
+    pagination,
+    sources: results.map((result, index) => ({
+      name: index === 0 ? 'ophim' : 'nguonc',
+      ok: result.status === 'fulfilled',
+    })),
+  }
+}

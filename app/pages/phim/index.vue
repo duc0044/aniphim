@@ -136,7 +136,7 @@ useHead({
 
           <div class="relative grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-end">
             <div>
-              <div class="inline-flex items-center gap-2 rounded-full border border-sky-300/25 bg-sky-300/10 px-3 py-1 text-xs font-bold tracking-[0.2em] text-sky-100 uppercase">
+              <div class="inline-flex items-center gap-2 rounded-full border border-orange-500/25 bg-orange-500/10 px-3 py-1 text-xs font-bold tracking-[0.2em] text-orange-200 uppercase">
                 <Sparkles class="size-3.5" />
                 AniPhim Library
               </div>
@@ -149,7 +149,7 @@ useHead({
 
               <div class="mt-6 grid gap-3 sm:grid-cols-3">
                 <div class="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-                  <div class="flex items-center gap-2 text-sky-200">
+                  <div class="flex items-center gap-2 text-orange-400">
                     <Clapperboard class="size-4" />
                     <span class="text-xs font-bold uppercase tracking-[0.18em]">Ket qua</span>
                   </div>
@@ -158,7 +158,7 @@ useHead({
                 </div>
 
                 <div class="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-                  <div class="flex items-center gap-2 text-sky-200">
+                  <div class="flex items-center gap-2 text-orange-400">
                     <Filter class="size-4" />
                     <span class="text-xs font-bold uppercase tracking-[0.18em]">Bo loc</span>
                   </div>
@@ -167,7 +167,7 @@ useHead({
                 </div>
 
                 <div class="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-                  <div class="flex items-center gap-2 text-sky-200">
+                  <div class="flex items-center gap-2 text-orange-400">
                     <Volume2 class="size-4" />
                     <span class="text-xs font-bold uppercase tracking-[0.18em]">Nguon</span>
                   </div>
@@ -179,8 +179,8 @@ useHead({
 
             <div class="relative rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-4 sm:p-5">
               <div
-                class="flex min-w-0 items-center rounded-[1.2rem] border border-white/10 bg-white/7 px-4 py-3 shadow-2xl shadow-sky-950/10">
-                <Search class="mr-3 size-4 shrink-0 text-sky-200" />
+                class="flex min-w-0 items-center rounded-[1.2rem] border border-white/10 bg-white/7 px-4 py-3 shadow-2xl shadow-orange-950/10">
+                <Search class="mr-3 size-4 shrink-0 text-orange-400" />
                 <input v-model="keyword" type="search" placeholder="Tim anime, movie, nhan vat..."
                   class="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500">
               </div>
@@ -189,17 +189,17 @@ useHead({
                 <p class="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Dang phim</p>
                 <div class="grid grid-cols-3 gap-2 rounded-[1.3rem] bg-white/6 p-1.5">
                   <button type="button" class="rounded-xl px-4 py-3 text-sm font-bold transition"
-                    :class="type === 'all' ? 'bg-sky-300 text-slate-950 shadow-lg shadow-sky-500/20' : 'text-slate-200 hover:bg-white/8 hover:text-white'"
+                    :class="type === 'all' ? 'bg-orange-500 text-slate-950 shadow-lg shadow-sky-500/20' : 'text-slate-200 hover:bg-white/8 hover:text-white'"
                     @click="type = 'all'">
                     Tat ca
                   </button>
                   <button type="button" class="rounded-xl px-4 py-3 text-sm font-bold transition"
-                    :class="type === 'series' ? 'bg-sky-300 text-slate-950 shadow-lg shadow-sky-500/20' : 'text-slate-200 hover:bg-white/8 hover:text-white'"
+                    :class="type === 'series' ? 'bg-orange-500 text-slate-950 shadow-lg shadow-sky-500/20' : 'text-slate-200 hover:bg-white/8 hover:text-white'"
                     @click="type = 'series'">
                     Series
                   </button>
                   <button type="button" class="rounded-xl px-4 py-3 text-sm font-bold transition"
-                    :class="type === 'single' ? 'bg-sky-300 text-slate-950 shadow-lg shadow-sky-500/20' : 'text-slate-200 hover:bg-white/8 hover:text-white'"
+                    :class="type === 'single' ? 'bg-orange-500 text-slate-950 shadow-lg shadow-sky-500/20' : 'text-slate-200 hover:bg-white/8 hover:text-white'"
                     @click="type = 'single'">
                     Movie
                   </button>
@@ -210,22 +210,22 @@ useHead({
                 <p class="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Ngon ngu</p>
                 <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <button type="button" class="rounded-2xl border px-4 py-3 text-sm font-bold transition"
-                    :class="audio === 'all' ? 'border-sky-300/55 bg-sky-300 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
+                    :class="audio === 'all' ? 'border-orange-500/55 bg-orange-500 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
                     @click="audio = 'all'">
                     Tieng Viet
                   </button>
                   <button type="button" class="rounded-2xl border px-4 py-3 text-sm font-bold transition"
-                    :class="audio === 'sub' ? 'border-sky-300/55 bg-sky-300 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
+                    :class="audio === 'sub' ? 'border-orange-500/55 bg-orange-500 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
                     @click="audio = 'sub'">
                     Vietsub
                   </button>
                   <button type="button" class="rounded-2xl border px-4 py-3 text-sm font-bold transition"
-                    :class="audio === 'voiceover' ? 'border-sky-300/55 bg-sky-300 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
+                    :class="audio === 'voiceover' ? 'border-orange-500/55 bg-orange-500 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
                     @click="audio = 'voiceover'">
                     Thuyet minh
                   </button>
                   <button type="button" class="rounded-2xl border px-4 py-3 text-sm font-bold transition"
-                    :class="audio === 'dub' ? 'border-sky-300/55 bg-sky-300 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
+                    :class="audio === 'dub' ? 'border-orange-500/55 bg-orange-500 text-slate-950' : 'border-white/10 bg-white/6 text-slate-200 hover:border-white/20 hover:bg-white/10 hover:text-white'"
                     @click="audio = 'dub'">
                     Long tieng
                   </button>
@@ -254,13 +254,13 @@ useHead({
         <div v-else class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
           <NuxtLink v-for="movie in filteredMovies" :key="`${movie.source}-${movie.slug}`"
             :to="{ path: `/phim/${movie.slug}`, query: { source: movie.source } }"
-            class="group relative overflow-hidden rounded-[1.4rem] border border-white/10 bg-slate-900 shadow-[0_18px_50px_rgba(2,6,23,0.45)] transition duration-300 hover:-translate-y-1 hover:border-sky-300/40 hover:shadow-[0_28px_80px_rgba(14,165,233,0.18)]">
+            class="group relative overflow-hidden rounded-[1.4rem] border border-white/10 bg-slate-900 shadow-[0_18px_50px_rgba(2,6,23,0.45)] transition duration-300 hover:-translate-y-1 hover:border-orange-500/40 hover:shadow-[0_28px_80px_rgba(14,165,233,0.18)]">
             <div class="relative aspect-2/3 overflow-hidden">
               <img :src="movie.thumb || movie.poster" :alt="movie.name"
                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
               <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/20 to-transparent" />
               <div class="absolute left-3 right-3 top-3 flex items-start justify-between gap-2">
-                <span class="rounded-full bg-sky-300 px-2.5 py-1 text-[11px] font-black text-slate-950">
+                <span class="rounded-full bg-orange-500 px-2.5 py-1 text-[11px] font-black text-slate-950">
                   {{ movie.source }}
                 </span>
                 <span v-if="getAudioBadge(movie.lang)"
@@ -278,7 +278,7 @@ useHead({
                     <span v-if="movie.episode" class="rounded-full bg-white/10 px-2 py-1 text-[10px] font-bold text-white">
                       {{ movie.episode }}
                     </span>
-                    <span v-if="movie.quality" class="rounded-full bg-sky-300 px-2 py-1 text-[10px] font-black text-slate-950">
+                    <span v-if="movie.quality" class="rounded-full bg-orange-500 px-2 py-1 text-[10px] font-black text-slate-950">
                       {{ movie.quality }}
                     </span>
                     <span v-if="movie.year" class="rounded-full bg-white/10 px-2 py-1 text-[10px] font-bold text-white">
@@ -306,7 +306,7 @@ useHead({
             Trang {{ page }}<template v-if="totalPages"> / {{ totalPages }}</template>
           </span>
           <button type="button"
-            class="grid size-12 place-items-center rounded-full bg-sky-300 text-slate-950 transition hover:bg-white"
+            class="grid size-12 place-items-center rounded-full bg-orange-500 text-slate-950 transition hover:bg-white"
             aria-label="Trang sau" @click="nextPage">
             <ChevronRight class="size-5" />
           </button>

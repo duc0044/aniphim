@@ -10,6 +10,7 @@ const sourceOptions = [
   { label: 'OPhim', value: 'ophim' },
   { label: 'NguonC', value: 'nguonc' },
 ]
+const { toggleFavorite, toggleWatchlist, isFavorite, isWatchlist } = useLibrary()
 
 const { data: movie, pending, error } = await useFetch(() => `/api/movies/${route.params.slug}`, {
   query: computed(() => ({
@@ -32,6 +33,23 @@ const firstWatchLink = computed(() => ({
   },
 }))
 const episodeCount = computed(() => servers.value.reduce((total: number, server: any) => total + (server.episodes?.length || 0), 0))
+const currentMovie = computed(() => {
+  if (!movie.value) return null
+  return {
+    source: activeSource.value,
+    slug: movie.value.slug,
+    name: movie.value.name,
+    originName: movie.value.originName,
+    thumb: movie.value.thumb,
+    poster: movie.value.poster,
+    episode: movie.value.episode,
+    quality: movie.value.quality,
+    lang: movie.value.lang,
+    year: movie.value.year,
+  }
+})
+const liked = computed(() => currentMovie.value ? isFavorite(currentMovie.value) : false)
+const queued = computed(() => currentMovie.value ? isWatchlist(currentMovie.value) : false)
 
 function episodeLink(index: number) {
   return {
@@ -58,6 +76,16 @@ function formatEpisodeName(name: string, index: number) {
 
 function actorInitial(name: string) {
   return name.trim().charAt(0).toUpperCase()
+}
+
+function onToggleFavorite() {
+  if (!currentMovie.value) return
+  toggleFavorite(currentMovie.value)
+}
+
+function onToggleWatchlist() {
+  if (!currentMovie.value) return
+  toggleWatchlist(currentMovie.value)
 }
 
 watch(requestedSource, () => {
@@ -107,7 +135,7 @@ useHead(() => ({
                 class="mx-auto aspect-2/3 w-29 rounded-md object-cover shadow-xl shadow-black/40 sm:w-52 lg:w-full">
 
               <h1 class="mt-4 text-[1.35rem] font-black leading-tight sm:text-2xl lg:mt-5">{{ movie.name }}</h1>
-              <p v-if="movie.originName" class="mt-1 text-sm font-bold text-slate-100 sm:text-sky-200">{{
+              <p v-if="movie.originName" class="mt-1 text-sm font-bold text-slate-100 sm:text-orange-400">{{
                 movie.originName }}</p>
 
               <div class="mt-3 hidden flex-wrap justify-center gap-2 text-xs font-black sm:flex lg:justify-start">
@@ -115,7 +143,7 @@ useHead(() => ({
                 <span v-if="movie.episode" class="rounded bg-white/12 px-2 py-1">{{ movie.episode }}</span>
                 <span v-if="movie.time" class="rounded bg-white/12 px-2 py-1">{{ movie.time }}</span>
                 <span v-if="movie.rating" class="inline-flex items-center gap-1 rounded bg-white/12 px-2 py-1">
-                  <Star class="size-3 fill-sky-300 text-sky-300" />
+                  <Star class="size-3 fill-orange-500 text-orange-500" />
                   {{ movie.rating.toFixed(1) }}
                 </span>
               </div>
@@ -142,7 +170,7 @@ useHead(() => ({
             <section
               class="mt-0 rounded-none border-y border-white/10 bg-transparent px-0 pb-0 pt-3 shadow-none sm:mt-0 sm:rounded-md sm:border sm:bg-[#15161b]/95 sm:p-5 sm:shadow-2xl sm:shadow-black/40 lg:p-5">
               <button type="button"
-                class="mx-auto flex items-center gap-1 pb-3 text-sm font-bold text-sky-200 sm:hidden"
+                class="mx-auto flex items-center gap-1 pb-3 text-sm font-bold text-orange-400 sm:hidden"
                 :aria-expanded="movieInfoOpen" @click="movieInfoOpen = !movieInfoOpen">
                 <span>Thông tin phim</span>
                 <ChevronDown class="size-4 transition" :class="movieInfoOpen ? 'rotate-180' : ''" />
@@ -168,7 +196,7 @@ useHead(() => ({
                 <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
                   <NuxtLink v-for="source in sourceOptions" :key="source.value" :to="sourceLink(source.value)"
                     class="shrink-0 rounded-md px-4 py-2 text-sm font-black transition"
-                    :class="activeSource === source.value ? 'bg-sky-400 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'">
+                    :class="activeSource === source.value ? 'bg-orange-500 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'">
                     {{ source.label }}
                   </NuxtLink>
                 </div>
@@ -178,7 +206,7 @@ useHead(() => ({
                 class="flex flex-col gap-4 border-b border-white/10 py-4 sm:flex-row sm:items-center sm:justify-between sm:py-5">
                 <div class="flex flex-wrap justify-center gap-3 sm:justify-start">
                   <NuxtLink :to="firstWatchLink"
-                    class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-sky-400 to-sky-300 px-7 text-sm font-black text-slate-950 transition hover:from-sky-300 hover:to-white sm:w-auto">
+                    class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-linear-to-r from-orange-500 to-orange-500 px-7 text-sm font-black text-slate-950 transition hover:from-orange-500 hover:to-white sm:w-auto">
                     <Play class="size-4 fill-current" />
                     Xem Ngay
                   </NuxtLink>
@@ -189,32 +217,32 @@ useHead(() => ({
                     <span class="text-xs font-black text-slate-300">Nguồn API</span>
                     <NuxtLink v-for="source in sourceOptions" :key="source.value" :to="sourceLink(source.value)"
                       class="shrink-0 rounded-md px-4 py-2 text-sm font-black transition"
-                      :class="activeSource === source.value ? 'bg-sky-400 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'">
+                      :class="activeSource === source.value ? 'bg-orange-500 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'">
                       {{ source.label }}
                     </NuxtLink>
                   </div>
 
                   <div class="flex items-center justify-between gap-3 px-8 sm:justify-center sm:px-0">
                   <button type="button"
-                    class="flex flex-col items-center gap-1 text-xs font-bold text-white transition hover:text-sky-200"
-                    aria-label="Yêu thích">
-                    <Heart class="size-5" />
+                    class="flex flex-col items-center gap-1 text-xs font-bold text-white transition hover:text-orange-400"
+                    :class="liked ? 'text-orange-400' : ''" aria-label="Yêu thích" @click="onToggleFavorite">
+                    <Heart class="size-5" :class="liked ? 'fill-current' : ''" />
                     <span>Yêu thích</span>
                   </button>
                   <button type="button"
-                    class="flex flex-col items-center gap-1 text-xs font-bold text-white transition hover:text-sky-200"
-                    aria-label="Thêm vào">
+                    class="flex flex-col items-center gap-1 text-xs font-bold text-white transition hover:text-orange-400"
+                    :class="queued ? 'text-orange-400' : ''" aria-label="Thêm vào" @click="onToggleWatchlist">
                     <Plus class="size-5" />
-                    <span>Thêm vào</span>
+                    <span>{{ queued ? 'Đã lưu' : 'Xem sau' }}</span>
                   </button>
                   <button type="button"
-                    class="flex flex-col items-center gap-1 text-xs font-bold text-white transition hover:text-sky-200"
+                    class="flex flex-col items-center gap-1 text-xs font-bold text-white transition hover:text-orange-400"
                     aria-label="Chia sẻ">
                     <Share2 class="size-5" />
                     <span>Chia sẻ</span>
                   </button>
                   <div v-if="movie.rating"
-                    class="inline-flex items-center gap-1.5 rounded-full bg-sky-400 px-3 py-1.5 text-sm font-black text-slate-950">
+                    class="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1.5 text-sm font-black text-slate-950">
                     <Star class="size-3.5 fill-current" />
                     {{ movie.rating.toFixed(1) }}
                   </div>
@@ -225,10 +253,10 @@ useHead(() => ({
               <div
                 class="mt-3 flex justify-between gap-6 border-b border-white/10 px-6 text-sm font-black sm:mt-0 sm:justify-center sm:px-0 sm:pt-5">
                 <button type="button" class="px-5 pb-3 sm:px-0"
-                  :class="activeTab === 'episodes' ? 'border-b-2 border-sky-300 text-sky-200' : 'text-slate-300'"
+                  :class="activeTab === 'episodes' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-slate-300'"
                   @click="activeTab = 'episodes'">Tập phim</button>
                 <button type="button" class="px-5 pb-3 sm:px-0"
-                  :class="activeTab === 'actors' ? 'border-b-2 border-sky-300 text-sky-200' : 'text-slate-300'"
+                  :class="activeTab === 'actors' ? 'border-b-2 border-orange-500 text-orange-400' : 'text-slate-300'"
                   @click="activeTab = 'actors'">Cast</button>
               </div>
 
@@ -238,7 +266,7 @@ useHead(() => ({
                 <div v-if="servers.length > 1" class="mt-3 flex gap-2 overflow-x-auto pb-2">
                   <button v-for="(server, index) in servers" :key="server.name" type="button"
                     class="shrink-0 rounded px-4 py-2 text-sm font-black"
-                    :class="selectedServer === index ? 'bg-sky-400 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'"
+                    :class="selectedServer === index ? 'bg-orange-500 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'"
                     @click="selectedServer = index">
                     {{ server.name }}
                   </button>
@@ -248,7 +276,7 @@ useHead(() => ({
                   class="mt-3 grid grid-cols-3 gap-2 rounded-md border border-white/10 p-3 sm:grid-cols-3 lg:grid-cols-6">
                   <NuxtLink v-for="(episode, index) in activeServer.episodes" :key="`${episode.name}-${index}`"
                     :to="episodeLink(index)"
-                    class="rounded-md bg-white/10 px-4 py-3 text-center text-sm font-black text-white transition first:bg-sky-400 first:text-slate-950 hover:bg-sky-400 hover:text-slate-950">
+                    class="rounded-md bg-white/10 px-4 py-3 text-center text-sm font-black text-white transition first:bg-orange-500 first:text-slate-950 hover:bg-orange-500 hover:text-slate-950">
                     {{ formatEpisodeName(episode.name, index) }}
                   </NuxtLink>
                 </div>
@@ -267,13 +295,13 @@ useHead(() => ({
                     <img v-if="actor.avatar" :src="actor.avatar" :alt="actor.name"
                       class="size-14 shrink-0 rounded-md object-cover">
                     <div v-else
-                      class="grid size-14 shrink-0 place-items-center rounded-md bg-sky-400/18 text-lg font-black text-sky-100 ring-1 ring-sky-300/20">
+                      class="grid size-14 shrink-0 place-items-center rounded-md bg-orange-500/18 text-lg font-black text-orange-200 ring-1 ring-orange-500/20">
                       {{ actorInitial(actor.name) }}
                     </div>
 
                     <div class="min-w-0">
                       <p class="truncate text-sm font-black text-white">{{ actor.name }}</p>
-                      <p class="mt-1 truncate text-xs font-semibold text-sky-200">
+                      <p class="mt-1 truncate text-xs font-semibold text-orange-400">
                         {{ actor.originalName || 'Tên quốc tế đang cập nhật' }}
                       </p>
                       <p class="mt-1 truncate text-xs font-semibold text-slate-400">

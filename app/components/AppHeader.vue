@@ -1,16 +1,30 @@
 <script setup lang="ts">
-import { Menu, Search, X } from 'lucide-vue-next'
+import { ChevronDown, Grid2x2, Menu, Search, X } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 const keyword = ref(typeof route.query.q === 'string' ? route.query.q : '')
 const mobileMenuOpen = ref(false)
+const mobileGenresOpen = ref(false)
+const desktopGenresOpen = ref(false)
 
 const navItems = [
-  { label: 'Trang chủ', to: '/' },
-  { label: 'Kho anime', to: '/phim' },
-  { label: 'Series', to: '/phim?type=series' },
-  { label: 'Movie', to: '/phim?type=movie' },
+  { label: 'Trang Chủ', to: '/' },
+  { label: 'Thư Viện', to: '/thu-vien' },
+  { label: 'Lịch Chiếu', to: '/lich-chieu' },
+]
+const genreItems = [
+  { label: 'Tu Tiên', to: '/the-loai/tu-tien' },
+  { label: 'Kiếm Hiệp', to: '/the-loai/kiem-hiep' },
+  { label: 'Cổ Trang', to: '/the-loai/co-trang' },
+  { label: 'Huyền Huyễn', to: '/the-loai/huyen-huyen' },
+  { label: 'Khoa Huyễn', to: '/the-loai/khoa-huyen' },
+  { label: 'Kỳ Ảo', to: '/the-loai/ky-ao' },
+  { label: 'Huyền Nghi', to: '/the-loai/huyen-nghi' },
+  { label: 'Cảnh Kỳ', to: '/the-loai/canh-ky' },
+  { label: 'Dã Sử', to: '/the-loai/da-su' },
+  { label: 'Đô Thị', to: '/the-loai/do-thi' },
+  { label: 'Đồng Nhân', to: '/the-loai/dong-nhan' },
 ]
 
 function isActive(to: string) {
@@ -28,10 +42,16 @@ function submitSearch() {
 
 function closeMobileMenu() {
   mobileMenuOpen.value = false
+  mobileGenresOpen.value = false
+}
+
+function closeDesktopGenres() {
+  desktopGenresOpen.value = false
 }
 
 watch(() => route.path, () => {
   closeMobileMenu()
+  closeDesktopGenres()
 })
 </script>
 
@@ -41,16 +61,35 @@ watch(() => route.path, () => {
       <AppLogo />
 
       <div class="hidden lg:flex lg:items-center lg:gap-7 lg:text-sm lg:font-semibold lg:text-slate-200">
-        <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to" class="shrink-0 transition hover:text-sky-200"
-          :class="isActive(item.to) ? 'text-sky-200' : 'text-slate-200'">
+        <div class="group relative" @mouseenter="desktopGenresOpen = true" @mouseleave="desktopGenresOpen = false">
+          <button type="button"
+            class="inline-flex items-center gap-1.5 rounded-t-md px-2 py-2 transition hover:text-orange-400"
+            :class="route.path.startsWith('/the-loai/') ? 'text-orange-400' : 'text-slate-200'">
+            <!-- <Grid2x2 class="size-3.5" /> -->
+            <span>Thể Loại</span>
+            <ChevronDown class="size-3.5 transition" :class="desktopGenresOpen ? 'rotate-180' : ''" />
+          </button>
+          <div
+            class="absolute left-0 top-full z-40 w-52 overflow-hidden rounded-b-md border border-white/10 bg-[#224566] shadow-2xl transition"
+            :class="desktopGenresOpen ? 'visible opacity-100' : 'invisible opacity-0'">
+            <NuxtLink v-for="genre in genreItems" :key="genre.to" :to="genre.to"
+              class="block px-4 py-2.5 text-base font-semibold text-slate-100 transition hover:bg-[#3d7eb7]"
+              :class="isActive(genre.to) ? 'bg-[#3d7eb7]' : ''">
+              {{ genre.label }}
+            </NuxtLink>
+          </div>
+        </div>
+
+        <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to" class="shrink-0 transition hover:text-orange-400"
+          :class="isActive(item.to) ? 'text-orange-400' : 'text-slate-200'">
           {{ item.label }}
         </NuxtLink>
       </div>
 
       <form
-        class="ml-auto flex w-full max-w-xs items-center rounded-full border border-white/10 bg-white/8 px-4 py-2 shadow-2xl shadow-sky-950/20 sm:max-w-sm"
+        class="ml-auto flex w-full max-w-xs items-center rounded-full border border-white/10 bg-white/8 px-4 py-2 shadow-2xl shadow-orange-900/20 sm:max-w-sm"
         @submit.prevent="submitSearch">
-        <Search class="mr-3 size-4 shrink-0 text-sky-200" />
+        <Search class="mr-3 size-4 shrink-0 text-orange-400" />
         <input v-model="keyword" type="search" placeholder="Tìm anime, hoạt hình..."
           class="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-400">
       </form>
@@ -76,9 +115,27 @@ watch(() => route.path, () => {
               </button>
             </div>
             <nav class="flex flex-col gap-1 p-4">
+              <button type="button"
+                class="flex items-center justify-between rounded-lg px-4 py-3 text-left text-base font-semibold text-slate-200 transition hover:bg-white/8 hover:text-orange-400"
+                :class="route.path.startsWith('/the-loai/') ? 'bg-white/8 text-orange-400' : ''"
+                @click="mobileGenresOpen = !mobileGenresOpen">
+                <span class="inline-flex items-center gap-2">
+                  <Grid2x2 class="size-4" />
+                  Thể Loại
+                </span>
+                <ChevronDown class="size-4 transition" :class="mobileGenresOpen ? 'rotate-180' : ''" />
+              </button>
+              <div v-if="mobileGenresOpen" class="ml-2 flex flex-col gap-1 border-l border-white/10 pl-2">
+                <NuxtLink v-for="genre in genreItems" :key="genre.to" :to="genre.to"
+                  class="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/8 hover:text-orange-400"
+                  :class="isActive(genre.to) ? 'bg-white/8 text-orange-400' : ''" @click="closeMobileMenu">
+                  {{ genre.label }}
+                </NuxtLink>
+              </div>
+
               <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to"
-                class="rounded-lg px-4 py-3 text-base font-semibold text-slate-200 transition hover:bg-white/8 hover:text-sky-200"
-                :class="isActive(item.to) ? 'bg-white/8 text-sky-200' : ''" @click="closeMobileMenu">
+                class="rounded-lg px-4 py-3 text-base font-semibold text-slate-200 transition hover:bg-white/8 hover:text-orange-400"
+                :class="isActive(item.to) ? 'bg-white/8 text-orange-400' : ''" @click="closeMobileMenu">
                 {{ item.label }}
               </NuxtLink>
             </nav>
