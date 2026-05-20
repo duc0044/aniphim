@@ -6,6 +6,7 @@ const selectedServer = ref(Math.max(Number(route.query.server || 0), 0))
 const selectedEpisode = ref(Math.max(Number(route.query.ep || 1) - 1, 0))
 const hasStarted = ref(false)
 const watchHistoryKey = 'aniphim-watch-history'
+const { toggleFavorite, toggleWatchlist, isFavorite, isWatchlist } = useLibrary()
 
 const { data: movie, pending, error } = await useFetch(`/api/movies/${route.params.slug}`, {
   query: {
@@ -18,6 +19,23 @@ const activeServer = computed(() => servers.value[selectedServer.value] ?? serve
 const activeEpisode = computed(() => activeServer.value?.episodes?.[selectedEpisode.value] ?? activeServer.value?.episodes?.[0])
 const playerUrl = computed(() => activeEpisode.value?.linkEmbed || activeEpisode.value?.linkM3u8 || '')
 const actorSummary = computed(() => (movie.value?.actors ?? []).map((actor: any) => actor.name).filter(Boolean).slice(0, 6).join(', '))
+const currentMovie = computed(() => {
+  if (!movie.value) return null
+  return {
+    source: String(route.query.source || movie.value.source || ''),
+    slug: movie.value.slug,
+    name: movie.value.name,
+    originName: movie.value.originName,
+    thumb: movie.value.thumb,
+    poster: movie.value.poster,
+    episode: movie.value.episode,
+    quality: movie.value.quality,
+    lang: movie.value.lang,
+    year: movie.value.year,
+  }
+})
+const liked = computed(() => currentMovie.value ? isFavorite(currentMovie.value) : false)
+const queued = computed(() => currentMovie.value ? isWatchlist(currentMovie.value) : false)
 
 type WatchHistoryItem = {
   source: string
@@ -52,6 +70,16 @@ function selectServer(index: number) {
 function startPlayer() {
   hasStarted.value = true
   saveWatchHistory()
+}
+
+function onToggleFavorite() {
+  if (!currentMovie.value) return
+  toggleFavorite(currentMovie.value)
+}
+
+function onToggleWatchlist() {
+  if (!currentMovie.value) return
+  toggleWatchlist(currentMovie.value)
 }
 
 function saveWatchHistory() {
@@ -126,7 +154,7 @@ useHead(() => ({
     <template v-else>
       <section class="mx-auto max-w-390 px-3 pb-16 pt-24 sm:px-6 sm:pt-36 lg:px-8 lg:pt-28 xl:px-10">
         <NuxtLink :to="{ path: `/phim/${route.params.slug}`, query: { source: route.query.source } }"
-          class="text-sm font-bold text-slate-100 hover:text-sky-200">
+          class="text-sm font-bold text-slate-100 hover:text-orange-400">
           ‹ Chi tiết phim
         </NuxtLink>
 
@@ -142,7 +170,7 @@ useHead(() => ({
               <div class="absolute inset-0 bg-black/45" />
               <div class="absolute inset-0 grid place-items-center">
                 <span
-                  class="grid size-16 place-items-center rounded-full bg-sky-400 text-slate-950 shadow-xl shadow-sky-950/30">
+                  class="grid size-16 place-items-center rounded-full bg-orange-500 text-slate-950 shadow-xl shadow-orange-950/30">
                   <Play class="size-7 fill-current" />
                 </span>
               </div>
@@ -151,13 +179,15 @@ useHead(() => ({
 
           <div
             class="flex items-center justify-center gap-7 border-t border-white/10 px-4 py-4 text-xs font-bold text-slate-100 sm:justify-start sm:gap-4 sm:py-3">
-            <button type="button" class="inline-flex items-center gap-2 hover:text-sky-200">
-              <Heart class="size-4 sm:size-3" /> Yêu thích
+            <button type="button" class="inline-flex items-center gap-2 hover:text-orange-400"
+              :class="liked ? 'text-orange-400' : ''" @click="onToggleFavorite">
+              <Heart class="size-4 sm:size-3" :class="liked ? 'fill-current' : ''" /> Yêu thích
             </button>
-            <button type="button" class="inline-flex items-center gap-2 hover:text-sky-200">
-              <Plus class="size-4 sm:size-3" /> Thêm vào
+            <button type="button" class="inline-flex items-center gap-2 hover:text-orange-400"
+              :class="queued ? 'text-orange-400' : ''" @click="onToggleWatchlist">
+              <Plus class="size-4 sm:size-3" /> {{ queued ? 'Đã lưu' : 'Xem sau' }}
             </button>
-            <button type="button" class="inline-flex items-center gap-2 hover:text-sky-200">
+            <button type="button" class="inline-flex items-center gap-2 hover:text-orange-400">
               <Share2 class="size-4 sm:size-3" /> Chia sẻ
             </button>
           </div>
@@ -170,13 +200,13 @@ useHead(() => ({
                 class="hidden h-28 w-20 rounded-md object-cover sm:block">
               <div>
                 <h1 class="text-[1.35rem] font-black leading-tight sm:text-2xl">{{ movie.name }}</h1>
-                <p v-if="movie.originName" class="mt-1 text-sm font-bold text-sky-200">{{ movie.originName }}</p>
+                <p v-if="movie.originName" class="mt-1 text-sm font-bold text-orange-400">{{ movie.originName }}</p>
                 <div class="mt-3 flex flex-wrap gap-2 text-xs font-black">
                   <span v-if="movie.quality" class="rounded bg-white/12 px-2 py-1">{{ movie.quality }}</span>
                   <span v-if="movie.episode" class="rounded bg-white/12 px-2 py-1">{{ movie.episode }}</span>
                   <span v-if="movie.time" class="rounded bg-white/12 px-2 py-1">{{ movie.time }}</span>
                   <span v-if="movie.rating"
-                    class="inline-flex items-center gap-1 rounded bg-sky-400 px-2 py-1 text-slate-950">
+                    class="inline-flex items-center gap-1 rounded bg-orange-500 px-2 py-1 text-slate-950">
                     <Star class="size-3 fill-current" />
                     {{ movie.rating.toFixed(1) }}
                   </span>
@@ -186,14 +216,14 @@ useHead(() => ({
 
             <p v-if="movie.content" class="mt-4 text-sm leading-7 text-slate-200">{{ movie.content }}</p>
 
-            <div class="mt-5 rounded-md bg-sky-400 px-4 py-3 text-sm font-black text-slate-950">
+            <div class="mt-5 rounded-md bg-orange-500 px-4 py-3 text-sm font-black text-slate-950">
               Đang xem {{ activeEpisode?.name || 'Tập 1' }}
             </div>
 
             <div v-if="servers.length > 1" class="mt-4 flex gap-2 overflow-x-auto pb-2">
               <button v-for="(server, index) in servers" :key="server.name" type="button"
                 class="shrink-0 rounded px-4 py-2 text-sm font-black"
-                :class="selectedServer === index ? 'bg-sky-400 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'"
+                :class="selectedServer === index ? 'bg-orange-500 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'"
                 @click="selectServer(index)">
                 {{ server.name }}
               </button>
@@ -204,7 +234,7 @@ useHead(() => ({
               <NuxtLink v-for="(episode, index) in activeServer.episodes" :key="`${episode.name}-${index}`"
                 :to="episodeLink(index)"
                 class="inline-flex items-center justify-center gap-2 rounded-md px-3 py-3 text-center text-sm font-black transition"
-                :class="selectedEpisode === index ? 'bg-sky-400 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'">
+                :class="selectedEpisode === index ? 'bg-orange-500 text-slate-950' : 'bg-white/10 text-white hover:bg-white/16'">
                 <Play class="size-3 fill-current" />
                 {{ episode.name }}
               </NuxtLink>
